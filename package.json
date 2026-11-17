@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build && node scripts/postbuild.mjs",
+    "build:vercel": "vite build --config vite.config.vercel.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "bun test tests"
