@@ -1,5 +1,3 @@
-import { api } from '../src/server/api'
-
-// Vercel maps this file to /api/health. Exported as a Web handler per method so
-// Vercel does not try to call the Hono instance as a Node (req, res) handler.
-export const GET = (request: Request) => api.fetch(request)
+// Vercel Function for GET /api/health. Kept dependency-free so there is nothing
+// to fail at load time; the Cloudflare Worker keeps the shared Hono routes.
+export const GET = () => Response.json({ ok: true })
