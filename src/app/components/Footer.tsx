@@ -2,11 +2,13 @@ import { ArrowUpRight } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 
 import { site } from '../../data/site'
+import { useSettings } from '../lib/settings'
 import { Lines, Magnetic, Reveal } from './motion'
 import { useLocalTime } from './Nav'
 
 export function Footer() {
   const time = useLocalTime()
+  const { c } = useSettings()
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [error, setError] = useState('')
@@ -17,11 +19,11 @@ export function Footer() {
     try {
       const response = await fetch('/api/contact', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(form) })
       const body = await response.json() as { error?: string }
-      if (!response.ok) throw new Error(body.error ?? 'Gagal ngirim. Coba lagi ya.')
+      if (!response.ok) throw new Error(body.error ?? c.ui.formError)
       setState('done')
     } catch (error) {
       setState('error')
-      setError(error instanceof Error ? error.message : 'Gagal ngirim. Coba lagi ya.')
+      setError(error instanceof Error ? error.message : c.ui.formError)
     }
   }
 
@@ -32,7 +34,11 @@ export function Footer() {
       <div className="mx-auto max-w-[1400px] px-5 py-20 sm:px-8 sm:py-28">
         <div className="grid gap-14 lg:grid-cols-[1.2fr_1fr] lg:gap-24">
           <div>
-            <Lines as="h2" className="font-display text-[clamp(46px,8vw,118px)]" lines={['Mau bikin', <>sesuatu <span className="text-accent">bareng</span></>]} />
+            <Lines
+              as="h2"
+              className="font-display text-[clamp(46px,8vw,118px)]"
+              lines={[c.ui.footerTop, <>{c.ui.footerBefore} <span className="text-accent">{c.ui.footerAccent}</span></>]}
+            />
             <Reveal delay={0.2} className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
               <Magnetic>
                 <a href={`mailto:${site.email}`} className="round inline-flex h-14 items-center gap-2 rounded-full bg-accent px-7 text-[16px] font-semibold text-bg transition-transform duration-300 hover:-translate-y-0.5">
@@ -40,37 +46,35 @@ export function Footer() {
                   <ArrowUpRight className="size-4" />
                 </a>
               </Magnetic>
-              <p className="text-[14px] text-muted">
-                {site.available ? 'Buka projek buat kuartal depan' : 'Lagi penuh, tapi tetap boleh mampir'}
-              </p>
+              <p className="text-[14px] text-muted">{site.available ? c.ui.openForWork : c.ui.fullyBooked}</p>
             </Reveal>
             <Reveal delay={0.25} className="mt-8 max-w-md text-[15px] leading-relaxed text-muted">
-              Mau bikin situs buat kelas, komunitas, atau projek sendiri? Ceritain aja — gak harus udah punya ide lengkap. Kadang setengah ide udah cukup buat mulai.
+              {c.ui.footerBlurb}
             </Reveal>
           </div>
 
           <Reveal delay={0.15}>
             {state === 'done' ? (
               <div className="flex h-full min-h-[320px] flex-col justify-center rounded-card border border-line bg-surface-2/50 p-8">
-                <p className="font-display text-[36px]">Makasih</p>
-                <p className="mt-2 text-[15px] text-muted">Demo selesai. Pesan lo lolos validasi, tapi gak disimpan dan gak dikirim.</p>
+                <p className="font-display text-[36px]">{c.ui.formDoneTitle}</p>
+                <p className="mt-2 text-[15px] text-muted">{c.ui.formDoneBody}</p>
               </div>
             ) : (
               <form onSubmit={submit} className="flex flex-col gap-3">
-                <p className="text-[13px] text-muted">Form demo. Pesan gak disimpan dan gak dikirim.</p>
+                <p className="text-[13px] text-muted">{c.ui.formNote}</p>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <input required placeholder="Nama lo" className={field} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                  <input required type="email" placeholder="Email" className={field} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                  <input required placeholder={c.ui.formName} className={field} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                  <input required type="email" placeholder={c.ui.formEmail} className={field} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                 </div>
                 <textarea
                   required
-                  placeholder="Ceritain sedikit soal projeknya"
+                  placeholder={c.ui.formMessage}
                   className={`${field} h-auto min-h-[140px] resize-none py-4`}
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                 />
                 <button type="submit" disabled={state === 'sending'} className="h-14 rounded-control border border-accent text-[15px] font-medium text-accent transition-colors hover:bg-accent hover:text-bg disabled:opacity-50">
-                  Kirim
+                  {state === 'sending' ? c.ui.formSending : c.ui.formSend}
                 </button>
                 {state === 'error' && <p className="text-[13px] text-accent">{error}</p>}
               </form>

@@ -3,14 +3,18 @@ import { ArrowUpRight, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
 
-import { experience, pepTalk, projects, services, site, testimonials } from '../../data/site'
+import { projectsFor, site } from '../../data/site'
 import { Lines, Magnetic, Parallax, Reveal } from '../components/motion'
 import { WorkCard } from '../components/WorkCard'
 import { cx } from '../lib/cx'
+import { useSettings } from '../lib/settings'
 
 const ease = [0.22, 1, 0.36, 1] as const
 
 export function Home() {
+  const { c, lang } = useSettings()
+  const projects = projectsFor(lang)
+
   return (
     <>
       {/* Hero */}
@@ -25,10 +29,10 @@ export function Home() {
           >
             <span className="round inline-flex items-center gap-2 rounded-full border border-accent/50 bg-accent/10 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
               <span className="round size-1.5 rounded-full bg-accent" aria-hidden />
-              Portfolio + pep talk
+              {c.ui.heroBadge}
             </span>
             <span className="round rounded-full border border-line px-3.5 py-1.5 text-[11px] uppercase tracking-[0.12em] text-muted">
-              {site.audience}
+              {c.ui.audienceLabel}
             </span>
           </motion.div>
 
@@ -45,9 +49,9 @@ export function Home() {
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.7, ease }} className="mt-9 border-t border-line pt-6">
             <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-lg">
-                <p className="text-pretty text-[17px] leading-relaxed text-muted sm:text-[19px]">{site.intro}</p>
+                <p className="text-pretty text-[17px] leading-relaxed text-muted sm:text-[19px]">{c.ui.intro}</p>
                 <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-faint">
-                  {site.role} · {site.handle}
+                  {c.ui.role} · {site.handle}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2.5">
@@ -55,14 +59,14 @@ export function Home() {
                   href="#karya"
                   className="round inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[15px] font-semibold text-bg transition-transform duration-300 hover:-translate-y-0.5"
                 >
-                  Lihat karya
+                  {c.ui.heroWork}
                   <ArrowUpRight className="size-4" />
                 </a>
                 <a
                   href="#pep-talk"
                   className="round inline-flex h-12 items-center gap-2 rounded-full border border-line-strong px-6 text-[15px] font-medium transition-colors hover:border-accent hover:text-accent"
                 >
-                  Baca pep talk
+                  {c.ui.heroPep}
                 </a>
               </div>
             </div>
@@ -73,7 +77,7 @@ export function Home() {
       {/* Marquee */}
       <div className="overflow-hidden border-y border-line py-5" aria-hidden>
         <ul className="font-display flex w-max animate-marquee items-center gap-10 whitespace-nowrap text-[28px] text-fg/60 sm:text-[36px]">
-          {[...site.marquee, ...site.marquee].map((item, i) => (
+          {[...c.ui.marquee, ...c.ui.marquee].map((item, i) => (
             <li key={i} className="flex items-center gap-10">
               {item}
               <span className="round size-2 rounded-full bg-accent" />
@@ -89,24 +93,17 @@ export function Home() {
             <Parallax src="/images/portrait.jpg" alt={site.name} className="aspect-[3/4] max-w-[460px] rounded-image" strength={6} />
           </Reveal>
           <div className="flex flex-col justify-center">
-            <Lines
-              as="h2"
-              className="font-display text-balance text-[40px] sm:text-[56px] lg:text-[64px]"
-              lines={['Kenapa site', 'ini ada']}
-            />
+            <Lines as="h2" className="font-display text-balance text-[40px] sm:text-[56px] lg:text-[64px]" lines={c.ui.whyLines} />
             <Reveal delay={0.2} className="mt-8 max-w-xl text-pretty text-[17px] leading-relaxed text-muted">
-              <p>
-                Gue bikin website sejak kelas sepuluh, dimulai dari laptop yang kipasnya berisik. Tiga tahun kemudian projek yang paling gue banggakan bukan yang paling keren
-                secara desain — tapi yang bikin orang lain bisa ikut belajar.
-              </p>
-              <p className="mt-4">
-                Jadi halaman ini dua fungsi: portfolio buat orang yang mau kerja bareng gue, dan pep talk buat Gen Alpha yang lagi mulai, plus Gen Beta yang belum lahir waktu
-                gue nulis ini.
-              </p>
+              {c.ui.whyBody.map((paragraph) => (
+                <p key={paragraph} className="mt-4 first:mt-0">
+                  {paragraph}
+                </p>
+              ))}
             </Reveal>
             <Reveal delay={0.3} className="mt-8">
               <Link to="/about" className="link-draw inline-flex items-center gap-1.5 text-[15px] font-medium">
-                Versi panjangnya
+                {c.ui.whyLink}
                 <ArrowUpRight className="size-4" />
               </Link>
             </Reveal>
@@ -117,8 +114,8 @@ export function Home() {
       {/* Karya */}
       <section id="karya" className="mx-auto max-w-[1400px] scroll-mt-20 px-5 pt-24 sm:px-8 sm:pt-32">
         <div className="flex items-end justify-between gap-6">
-          <Lines as="h2" className="font-display text-[44px] sm:text-[64px]" lines={['Karya gue']} />
-          <Reveal className="hidden pb-2 text-[13px] text-muted sm:block">{projects.length} projek, 2024 sampai sekarang</Reveal>
+          <Lines as="h2" className="font-display text-[44px] sm:text-[64px]" lines={c.ui.workLines} />
+          <Reveal className="hidden pb-2 text-[13px] text-muted sm:block">{c.ui.workCount.replace('{n}', String(projects.length))}</Reveal>
         </div>
         <div className="mt-12 grid gap-x-6 gap-y-14 md:grid-cols-2 lg:gap-x-8 lg:gap-y-20">
           {projects.map((p, i) => (
@@ -131,13 +128,13 @@ export function Home() {
       <section id="level-up" className="mx-auto max-w-[1400px] scroll-mt-20 px-5 pt-28 sm:px-8 sm:pt-40">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
           <div>
-            <Lines as="h2" className="font-display text-[40px] sm:text-[56px]" lines={['Level up']} />
+            <Lines as="h2" className="font-display text-[40px] sm:text-[56px]" lines={c.ui.levelLines} />
             <Reveal delay={0.1} className="mt-5 max-w-sm text-[16px] leading-relaxed text-muted">
-              Rank gue naik bukan karena sekali viral. Ini tiga level yang beneran gue lewatin, lengkap sama bagian gagalnya.
+              {c.ui.levelBody}
             </Reveal>
           </div>
           <ol className="border-t border-line">
-            {experience.map((e, i) => (
+            {c.experience.map((e, i) => (
               <Reveal key={e.title} delay={i * 0.06}>
                 <li className="grid gap-2 border-b border-line py-7 sm:grid-cols-[180px_1fr] sm:items-baseline sm:gap-6">
                   <span className="text-[12px] uppercase tracking-[0.14em] tabular-nums text-accent">{e.period}</span>
@@ -159,9 +156,9 @@ export function Home() {
       <section id="skill" className="mx-auto max-w-[1400px] scroll-mt-20 px-5 pt-28 sm:px-8 sm:pt-40">
         <div className="grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-20">
           <div>
-            <Lines as="h2" className="font-display text-[40px] sm:text-[56px]" lines={['Skill gue']} />
+            <Lines as="h2" className="font-display text-[40px] sm:text-[56px]" lines={c.ui.skillLines} />
             <Reveal delay={0.1} className="mt-4 max-w-xs text-[15px] leading-relaxed text-muted">
-              Empat hal, dikerjain sampai bener. Kebanyakan projek pakai dua di antaranya.
+              {c.ui.skillBody}
             </Reveal>
           </div>
           <Services />
@@ -170,9 +167,9 @@ export function Home() {
 
       {/* Pep talk */}
       <section id="pep-talk" className="mx-auto max-w-[1400px] scroll-mt-20 px-5 pt-28 sm:px-8 sm:pt-40">
-        <Lines as="h2" className="font-display text-balance text-[44px] sm:text-[64px]" lines={['Pep talk', 'buat dua generasi']} />
+        <Lines as="h2" className="font-display text-balance text-[44px] sm:text-[64px]" lines={c.ui.pepLines} />
         <div className="mt-12 grid gap-5 md:grid-cols-2">
-          {pepTalk.map((p, i) => (
+          {c.pepTalk.map((p, i) => (
             <Reveal key={p.tag} delay={i * 0.08}>
               <article
                 className={cx(
@@ -224,9 +221,10 @@ function HeroField() {
 
 function Services() {
   const [open, setOpen] = useState(0)
+  const { c } = useSettings()
   return (
     <ul className="border-t border-line">
-      {services.map((s, i) => {
+      {c.services.map((s, i) => {
         const isOpen = open === i
         return (
           <li key={s.title} className="border-b border-line">
@@ -258,7 +256,8 @@ function Services() {
 
 function Testimonials() {
   const [index, setIndex] = useState(0)
-  const t = testimonials[index]
+  const { c } = useSettings()
+  const t = c.testimonials[index]
   return (
     <div className="rounded-[32px] bg-accent px-6 py-14 text-bg sm:px-14 sm:py-20">
       <div className="mx-auto max-w-3xl">
@@ -271,11 +270,11 @@ function Testimonials() {
           </motion.blockquote>
         </AnimatePresence>
         <div className="mt-10 flex items-center gap-2">
-          {testimonials.map((_, i) => (
+          {c.testimonials.map((_, i) => (
             <button
               key={i}
               type="button"
-              aria-label={`Pep talk ${i + 1}`}
+              aria-label={c.ui.testimonyAria.replace('{n}', String(i + 1))}
               onClick={() => setIndex(i)}
               className={cx('h-1.5 rounded-[3px] transition-all duration-500', i === index ? 'w-10 bg-bg' : 'w-4 bg-bg/30 hover:bg-bg/50')}
             />
@@ -283,9 +282,9 @@ function Testimonials() {
           <Magnetic className="ml-auto">
             <button
               type="button"
-              onClick={() => setIndex((index + 1) % testimonials.length)}
+              onClick={() => setIndex((index + 1) % c.testimonials.length)}
               className="grid size-12 place-items-center rounded-[14px] border border-bg/20 transition-colors hover:bg-bg hover:text-accent"
-              aria-label="Berikutnya"
+              aria-label={c.ui.testimonyNext}
             >
               <ArrowUpRight className="size-4 rotate-45" />
             </button>

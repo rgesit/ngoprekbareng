@@ -2,10 +2,12 @@ import { AnimatePresence, animate, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 
 import { site } from '../../data/site'
+import { useSettings } from '../lib/settings'
 
 // A short counted reveal on first visit per tab. Everything is skipped when
 // the user prefers reduced motion.
 export function Preloader() {
+  const { c } = useSettings()
   const [show, setShow] = useState(() => {
     if (typeof window === 'undefined') return false
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
@@ -38,7 +40,7 @@ export function Preloader() {
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
         >
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-accent">Gaskeun</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-accent">{c.ui.preloader}</p>
             <p className="font-display mt-2 text-[28px] sm:text-[40px]">{site.handle}</p>
           </motion.div>
           <p className="font-display text-[80px] leading-none tabular-nums text-accent sm:text-[140px]">{count}</p>

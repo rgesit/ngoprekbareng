@@ -4,9 +4,11 @@ import { Link } from 'react-router'
 
 import type { Project } from '../../data/site'
 import { cx } from '../lib/cx'
+import { useSettings } from '../lib/settings'
 import { Parallax } from './motion'
 
 export function WorkCard({ project, index = 0 }: { project: Project; index?: number }) {
+  const { c } = useSettings()
   const ref = useRef<HTMLAnchorElement>(null)
   const [hover, setHover] = useState(false)
   const x = useSpring(useMotionValue(0), { stiffness: 300, damping: 30 })
@@ -45,7 +47,7 @@ export function WorkCard({ project, index = 0 }: { project: Project; index?: num
               hover ? 'scale-100 opacity-100' : 'scale-75 opacity-0',
             )}
           >
-            Buka ceritanya
+            {c.ui.cardHover}
           </motion.span>
         </div>
         <div className="mt-4 flex items-baseline justify-between gap-4">

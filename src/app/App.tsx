@@ -5,6 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-route
 import { Footer } from './components/Footer'
 import { Nav } from './components/Nav'
 import { Preloader } from './components/Preloader'
+import { SettingsProvider } from './lib/settings'
 import { About } from './pages/About'
 import { Home } from './pages/Home'
 import { Work } from './pages/Work'
@@ -48,12 +49,14 @@ function Pages() {
 
 export function App() {
   return (
-    <BrowserRouter>
-      <Preloader />
-      <ScrollManager />
-      <Nav />
-      <Pages />
-      <Footer />
-    </BrowserRouter>
+    <SettingsProvider>
+      <BrowserRouter>
+        <Preloader />
+        <ScrollManager />
+        <Nav />
+        <Pages />
+        <Footer />
+      </BrowserRouter>
+    </SettingsProvider>
   )
 }

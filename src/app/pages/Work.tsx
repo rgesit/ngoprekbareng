@@ -2,14 +2,17 @@ import { motion } from 'motion/react'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router'
 
-import { bySlug, projects } from '../../data/site'
+import { projectsFor } from '../../data/site'
 import { Lines, Parallax, Reveal } from '../components/motion'
+import { useSettings } from '../lib/settings'
 
 const ease = [0.22, 1, 0.36, 1] as const
 
 export function Work() {
   const { slug } = useParams()
-  const project = slug ? bySlug(slug) : undefined
+  const { c, lang } = useSettings()
+  const projects = projectsFor(lang)
+  const project = slug ? projects.find((p) => p.slug === slug) : undefined
   if (!project) return <Navigate to="/" replace />
   const index = projects.findIndex((p) => p.slug === project.slug)
   const next = projects[(index + 1) % projects.length]
@@ -18,7 +21,7 @@ export function Work() {
     <article className="mx-auto max-w-[1400px] px-5 pt-28 sm:px-8 sm:pt-36">
       <Link to="/#karya" className="inline-flex h-9 items-center gap-1.5 text-[14px] text-muted transition-colors hover:text-fg">
         <ArrowLeft className="size-4" />
-        Semua karya
+        {c.ui.workBack}
       </Link>
 
       <div className="mt-8 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
@@ -42,10 +45,10 @@ export function Work() {
         <Reveal>
           <dl className="grid grid-cols-2 gap-x-6 gap-y-8 text-[14px] lg:grid-cols-1">
             {[
-              ['Buat', project.client],
-              ['Tahun', project.year],
-              ['Peran', project.role.join(', ')],
-              ['Hasil', project.deliverables.join(', ')],
+              [c.ui.labelClient, project.client],
+              [c.ui.labelYear, project.year],
+              [c.ui.labelRole, project.role.join(', ')],
+              [c.ui.labelDeliverables, project.deliverables.join(', ')],
             ].map(([label, value]) => (
               <div key={label} className="border-t border-line pt-3">
                 <dt className="text-muted">{label}</dt>
@@ -55,7 +58,7 @@ export function Work() {
             {project.link && (
               <div className="border-t border-line pt-3">
                 <a href={project.link} className="link-draw inline-flex items-center gap-1 font-medium">
-                  Buka situsnya
+                  {c.ui.openSite}
                   <ArrowUpRight className="size-4" />
                 </a>
               </div>
@@ -85,7 +88,7 @@ export function Work() {
       </div>
 
       <Link to={`/work/${next.slug}`} className="group mt-32 block border-t border-line pt-10">
-        <p className="text-[14px] text-muted">Projek berikutnya</p>
+        <p className="text-[14px] text-muted">{c.ui.nextProject}</p>
         <div className="mt-3 flex items-end justify-between gap-6">
           <h2 className="font-display text-[clamp(44px,8vw,120px)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-3">{next.title}</h2>
           <span className="image-frame hidden aspect-[4/3] w-[260px] shrink-0 rounded-[20px] sm:block" style={{ background: next.tint }}>
