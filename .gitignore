@@ -1,5 +1,6 @@
 node_modules
 dist
+.wp-local
 .wrangler
 .dev.vars
 .dev.vars.*

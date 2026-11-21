@@ -8,7 +8,7 @@ export const site = {
   handle: '@assalimi',
   location: 'Jakarta',
   timezone: 'Asia/Jakarta',
-  email: 'hai@assalimi.com',
+  email: 'hai@assalimi.my.id',
   available: true,
   socials: [
     { label: 'Instagram', href: '#' },

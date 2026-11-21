@@ -1,0 +1,14 @@
+/*
+Theme Name: Assalimi
+Theme URI: https://ngoprekbareng.vercel.app
+Author: R. Gesit Prasasti Alam
+Description: Tema portfolio dua bahasa (ID/EN) dengan mode gelap/terang. Konten diatur lewat CPT projek, layanan, testimoni, pengalaman, pep talk, dan halaman "Konten Situs".
+Version: 1.0.0
+Requires at least: 6.5
+Requires PHP: 8.0
+License: MIT
+Text Domain: assalimi
+*/
+
+/* Gaya sebenarnya di-build dari src/theme.css ke assets/theme.css
+   (Tailwind v4). File ini hanya wajib ada sebagai penanda tema. */

@@ -9,7 +9,11 @@
     "build:vercel": "vite build --config vite.config.vercel.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "bun test tests"
+    "test": "bun test tests",
+    "wp:export": "bun run scripts/export-wp-content.ts",
+    "wp:css": "vite build --config wordpress/vite.theme.config.ts",
+    "wp:setup": "bash scripts/wp-local.sh",
+    "wp:serve": "bash scripts/wp-local.sh serve"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
