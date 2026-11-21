@@ -71,9 +71,13 @@ export function mergedProjectMeta(overrides?: ContentOverrides | null): ProjectM
   return overrides?.projects?.length ? overrides.projects : projectMeta
 }
 
-export function mergedProjects(lang: Lang, overrides?: ContentOverrides | null): Project[] {
+export function mergedProjects(lang: Lang, overrides?: ContentOverrides | null, cmsOrigin = ''): Project[] {
   const content = mergedContent(lang, overrides)
-  return mergedProjectMeta(overrides).map((meta) => ({ ...meta, ...(content.projects[meta.slug] ?? emptyProjectText()) }))
+  return mergedProjectMeta(overrides).map((meta) => ({
+    ...meta,
+    cover: resolveImage(meta.cover, cmsOrigin),
+    ...(content.projects[meta.slug] ?? emptyProjectText()),
+  }))
 }
 
 /** Path `/media/...` dari CMS ikut pindah ke origin CMS kalau situs disajikan dari domain lain. */

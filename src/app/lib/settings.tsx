@@ -77,7 +77,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const site = useMemo(() => mergedSite(overrides), [overrides])
   const content = useMemo(() => mergedContent(lang, overrides), [lang, overrides])
-  const projects = useMemo(() => mergedProjects(lang, overrides), [lang, overrides])
+  const projects = useMemo(() => mergedProjects(lang, overrides, cmsOrigin), [lang, overrides])
   const portrait = useMemo(() => portraitFor(overrides, cmsOrigin), [overrides])
 
   useEffect(() => {
