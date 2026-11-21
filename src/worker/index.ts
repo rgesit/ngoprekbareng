@@ -1,8 +1,10 @@
-import { api } from '../server/api'
+import { api, authFor, type Env } from '../server/api'
 
-const app = api
-
-// Static assets are served by Cloudflare; Vercel serves them from dist/ instead.
-app.all('*', (c) => c.env.ASSETS.fetch(c.req.raw))
-
-export default app
+// Auth harus jalan sebelum aset/SPA, supaya /auth/freebuff/* sampai ke SDK.
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const auth = authFor(env)
+    if (!auth) return api.fetch(request, env, ctx)
+    return auth.wrap((req: Request) => api.fetch(req, env, ctx))(request)
+  },
+}

@@ -7,6 +7,7 @@ import { Nav } from './components/Nav'
 import { Preloader } from './components/Preloader'
 import { SettingsProvider } from './lib/settings'
 import { About } from './pages/About'
+import { Cms } from './pages/Cms'
 import { Home } from './pages/Home'
 import { Work } from './pages/Work'
 
@@ -40,10 +41,22 @@ function Pages() {
           <Route index element={<Home />} />
           <Route path="work/:slug" element={<Work />} />
           <Route path="about" element={<About />} />
+          <Route path="cms" element={<Cms />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </motion.main>
     </AnimatePresence>
+  )
+}
+
+function Chrome() {
+  const { pathname } = useLocation()
+  if (pathname.startsWith('/cms')) return null
+  return (
+    <>
+      <Nav />
+      <Footer />
+    </>
   )
 }
 
@@ -53,9 +66,8 @@ export function App() {
       <BrowserRouter>
         <Preloader />
         <ScrollManager />
-        <Nav />
+        <Chrome />
         <Pages />
-        <Footer />
       </BrowserRouter>
     </SettingsProvider>
   )

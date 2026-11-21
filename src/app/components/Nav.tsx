@@ -2,7 +2,7 @@ import { Moon, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router'
 
-import { site, type Lang } from '../../data/site'
+import type { Lang } from '../../data/site'
 import { cx } from '../lib/cx'
 import { useSettings } from '../lib/settings'
 
@@ -11,22 +11,22 @@ const LANGS: Array<{ id: Lang; label: string }> = [
   { id: 'en', label: 'EN' },
 ]
 
-export function useLocalTime() {
+export function useLocalTime(timezone = 'Asia/Jakarta') {
   const [time, setTime] = useState('')
   useEffect(() => {
-    const tick = () => setTime(new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: site.timezone }).format(new Date()))
+    const tick = () => setTime(new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: timezone }).format(new Date()))
     tick()
     const id = window.setInterval(tick, 15_000)
     return () => window.clearInterval(id)
-  }, [])
+  }, [timezone])
   return time
 }
 
 export function Nav() {
-  const time = useLocalTime()
   const location = useLocation()
   const [hidden, setHidden] = useState(false)
-  const { c, lang, setLang, theme, toggleTheme } = useSettings()
+  const { c, site, lang, setLang, theme, toggleTheme } = useSettings()
+  const time = useLocalTime(site.timezone)
 
   useEffect(() => {
     let last = window.scrollY

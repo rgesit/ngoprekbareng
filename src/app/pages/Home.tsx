@@ -3,7 +3,6 @@ import { ArrowUpRight, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
 
-import { projectsFor, site } from '../../data/site'
 import { Lines, Magnetic, Parallax, Reveal } from '../components/motion'
 import { WorkCard } from '../components/WorkCard'
 import { cx } from '../lib/cx'
@@ -12,8 +11,7 @@ import { useSettings } from '../lib/settings'
 const ease = [0.22, 1, 0.36, 1] as const
 
 export function Home() {
-  const { c, lang } = useSettings()
-  const projects = projectsFor(lang)
+  const { c, projects, site, portrait } = useSettings()
 
   return (
     <>
@@ -90,7 +88,7 @@ export function Home() {
       <section id="kenapa" className="mx-auto max-w-[1400px] scroll-mt-24 px-5 pt-24 sm:px-8 sm:pt-32">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
           <Reveal>
-            <Parallax src="/images/portrait.jpg" alt={site.name} className="aspect-[3/4] max-w-[460px] rounded-image" strength={6} />
+            <Parallax src={portrait} alt={site.name} className="aspect-[3/4] max-w-[460px] rounded-image" strength={6} />
           </Reveal>
           <div className="flex flex-col justify-center">
             <Lines as="h2" className="font-display text-balance text-[40px] sm:text-[56px] lg:text-[64px]" lines={c.ui.whyLines} />

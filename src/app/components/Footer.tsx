@@ -1,14 +1,14 @@
 import { ArrowUpRight } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 
-import { site } from '../../data/site'
+import { cmsUrl } from '../lib/api'
 import { useSettings } from '../lib/settings'
 import { Lines, Magnetic, Reveal } from './motion'
 import { useLocalTime } from './Nav'
 
 export function Footer() {
-  const time = useLocalTime()
-  const { c } = useSettings()
+  const { c, site } = useSettings()
+  const time = useLocalTime(site.timezone)
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [error, setError] = useState('')
@@ -17,7 +17,7 @@ export function Footer() {
     e.preventDefault()
     setState('sending')
     try {
-      const response = await fetch('/api/contact', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(form) })
+      const response = await fetch(cmsUrl('/api/contact'), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(form) })
       const body = await response.json() as { error?: string }
       if (!response.ok) throw new Error(body.error ?? c.ui.formError)
       setState('done')

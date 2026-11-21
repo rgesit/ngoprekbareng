@@ -2,7 +2,6 @@ import { motion } from 'motion/react'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router'
 
-import { projectsFor } from '../../data/site'
 import { Lines, Parallax, Reveal } from '../components/motion'
 import { useSettings } from '../lib/settings'
 
@@ -10,8 +9,7 @@ const ease = [0.22, 1, 0.36, 1] as const
 
 export function Work() {
   const { slug } = useParams()
-  const { c, lang } = useSettings()
-  const projects = projectsFor(lang)
+  const { c, projects } = useSettings()
   const project = slug ? projects.find((p) => p.slug === slug) : undefined
   if (!project) return <Navigate to="/" replace />
   const index = projects.findIndex((p) => p.slug === project.slug)

@@ -1,6 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
-import { content, type Content, type Lang } from '../../data/site'
+import type { Content, Lang, Project } from '../../data/site'
+import {
+  mergedContent,
+  mergedProjects,
+  mergedSite,
+  portraitFor,
+  type ContentOverrides,
+  type SiteInfo,
+} from '../../data/overrides'
+import { cmsFetch, cmsOrigin } from './api'
 
 export type Theme = 'dark' | 'light'
 
@@ -14,6 +23,11 @@ interface Settings {
   theme: Theme
   toggleTheme: () => void
   c: Content
+  site: SiteInfo
+  projects: Project[]
+  portrait: string
+  overrides: ContentOverrides | null
+  reload: () => Promise<void>
 }
 
 const SettingsContext = createContext<Settings | null>(null)
@@ -32,6 +46,21 @@ function storedTheme(): Theme {
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(() => (typeof window === 'undefined' ? 'id' : storedLang()))
   const [theme, setTheme] = useState<Theme>(() => (typeof window === 'undefined' ? 'dark' : storedTheme()))
+  const [overrides, setOverrides] = useState<ContentOverrides | null>(null)
+
+  const reload = useCallback(async () => {
+    try {
+      const data = await cmsFetch<ContentOverrides>('/api/content')
+      setOverrides(data && typeof data === 'object' ? data : null)
+    } catch {
+      // CMS belum di-deploy atau offline: pakai konten default di site.ts.
+      setOverrides(null)
+    }
+  }, [])
+
+  useEffect(() => {
+    void reload()
+  }, [reload])
 
   const setLang = useCallback((next: Lang) => {
     setLangState(next)
@@ -46,10 +75,15 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const site = useMemo(() => mergedSite(overrides), [overrides])
+  const content = useMemo(() => mergedContent(lang, overrides), [lang, overrides])
+  const projects = useMemo(() => mergedProjects(lang, overrides), [lang, overrides])
+  const portrait = useMemo(() => portraitFor(overrides, cmsOrigin), [overrides])
+
   useEffect(() => {
     document.documentElement.lang = lang
-    document.title = content[lang].ui.docTitle
-  }, [lang])
+    document.title = content.ui.docTitle
+  }, [lang, content.ui.docTitle])
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -57,8 +91,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }, [theme])
 
   const value = useMemo<Settings>(
-    () => ({ lang, setLang, theme, toggleTheme, c: content[lang] }),
-    [lang, setLang, theme, toggleTheme],
+    () => ({ lang, setLang, theme, toggleTheme, c: content, site, projects, portrait, overrides, reload }),
+    [lang, setLang, theme, toggleTheme, content, site, projects, portrait, overrides, reload],
   )
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>

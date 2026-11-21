@@ -8,5 +8,11 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": true
   },
+  // Binding lokal untuk `vite dev` / `wrangler dev`. Saat deploy lewat Sites,
+  // database dan bucket asli dipasang oleh platform dengan nama yang sama.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "cms-local", "database_id": "00000000-0000-0000-0000-000000000000" }
+  ],
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "cms-local" }],
   "observability": { "enabled": true }
 }

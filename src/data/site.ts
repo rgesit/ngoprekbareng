@@ -38,7 +38,7 @@ export interface Project extends ProjectText {
 }
 
 // Bahasa-netral: gambar, warna, tahun. Teksnya ada di `content[lang].projects`.
-const projectMeta: Array<Omit<Project, keyof ProjectText>> = [
+export const projectMeta: Array<Omit<Project, keyof ProjectText>> = [
   { slug: 'aura-farming', year: '2026', cover: '/images/aurora.jpg', tint: '#d9ff3f', size: 'large' },
   { slug: 'no-cap-notes', year: '2026', cover: '/images/meridian.jpg', tint: '#7ef2ff', size: 'small' },
   { slug: 'sigma-study-kit', year: '2025', cover: '/images/fold.jpg', tint: '#ff5fd2', size: 'small' },
@@ -316,8 +316,8 @@ const id: Content = {
     fullyBooked: 'Lagi penuh, tapi tetap boleh mampir',
     footerBlurb: 'Mau bikin situs buat kelas, komunitas, atau projek sendiri? Ceritain aja — gak harus udah punya ide lengkap. Kadang setengah ide udah cukup buat mulai.',
     formDoneTitle: 'Makasih',
-    formDoneBody: 'Demo selesai. Pesan lo lolos validasi, tapi gak disimpan dan gak dikirim.',
-    formNote: 'Form demo. Pesan gak disimpan dan gak dikirim.',
+    formDoneBody: 'Pesan lo udah masuk ke inbox CMS. Gue baca semua, biasanya dibalas dalam beberapa hari.',
+    formNote: 'Pesan lo masuk ke inbox CMS. Sertakan email biar gampang dibalas.',
     formName: 'Nama lo',
     formEmail: 'Email',
     formMessage: 'Ceritain sedikit soal projeknya',
@@ -532,8 +532,8 @@ const en: Content = {
     fullyBooked: 'Fully booked, but you can still say hi',
     footerBlurb: 'Need a site for your class, community, or your own project? Just tell me — you do not need a complete idea. Half an idea is often enough to start.',
     formDoneTitle: 'Thank you',
-    formDoneBody: 'Demo finished. Your message passed validation, but it was not stored or sent anywhere.',
-    formNote: 'Demo form. Messages are not stored or sent.',
+    formDoneBody: 'Your message is in the CMS inbox. I read everything and usually reply within a few days.',
+    formNote: 'Your message goes to the CMS inbox. Leave an email so it is easy to reply.',
     formName: 'Your name',
     formEmail: 'Email',
     formMessage: 'Tell me a little about the project',
