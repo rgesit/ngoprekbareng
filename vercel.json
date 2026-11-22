@@ -3,5 +3,13 @@
   "framework": "vite",
   "buildCommand": "bun run build:vercel",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/((?!api/|assets/).*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/((?!api/|assets/).*)", "destination": "/index.html" }],
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "assalimi.my.id" }],
+      "destination": "https://www.assalimi.my.id/$1",
+      "permanent": true
+    }
+  ]
 }
