@@ -16,6 +16,9 @@ export type Env = {
 // api/ tidak memakai file ini.
 const app = new Hono<{ Bindings: Env }>()
 
+// Domain milik situs ini. Dipakai untuk CORS (saat build statis lama masih
+// memanggil API) dan untuk memilih base URL sign-in yang benar saat halaman
+// dibuka dari domain sendiri, bukan dari alamat *.freebuff.site.
 const allowedOrigins = new Set(['https://assalimi.my.id', 'https://www.assalimi.my.id'])
 
 function originAllowed(origin: string): boolean {
@@ -40,28 +43,65 @@ app.use(
 
 // --- Login (Sign in with Freebuff) -----------------------------------------
 
-let authInstance: FreebuffAuth | undefined
+const authInstances = new Map<string, FreebuffAuth>()
 
-/** Satu instance per isolate supaya cache discovery & signing key ikut dipakai. */
-export function authFor(env: Env): FreebuffAuth | null {
-  if (!env.FREEBUFF_CLIENT_ID || !env.APP_ORIGIN) return null
-  authInstance ??= createFreebuffAuth({
-    clientId: env.FREEBUFF_CLIENT_ID,
-    issuer: env.FREEBUFF_ISSUER,
-    baseUrl: env.APP_ORIGIN,
-    allowInsecureLocalhost: /^http:\/\/(localhost|127\.0\.0\.1|\[::1\])/.test(env.APP_ORIGIN),
-  })
-  return authInstance
+function requestOrigin(request: Request): string {
+  const fromHeader = request.headers.get('origin')
+  if (fromHeader) return fromHeader
+  try {
+    return new URL(request.url).origin
+  } catch {
+    return ''
+  }
+}
+
+/**
+ * Origin yang boleh jadi base URL sign-in. Isinya tetap daftar tertutup: domain
+ * situs sendiri, origin deployment dari platform, dan localhost untuk dev.
+ * Jadi ini bukan "percaya header Host", melainkan memilih alamat yang memang
+ * sudah kita miliki — perlu karena situs bisa dibuka dari domain sendiri atau
+ * dari alamat *.freebuff.site.
+ */
+function authOriginAllowed(origin: string, env: Env): boolean {
+  if (!origin) return false
+  if (origin === env.APP_ORIGIN) return true
+  if (allowedOrigins.has(origin)) return true
+  return /^http:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(origin)
+}
+
+function baseUrlFor(env: Env, request: Request): string | null {
+  const origin = requestOrigin(request)
+  if (authOriginAllowed(origin, env)) return origin
+  return env.APP_ORIGIN || null
+}
+
+/** Satu instance per base URL supaya cache discovery & signing key ikut dipakai. */
+export function authFor(env: Env, request?: Request): FreebuffAuth | null {
+  if (!env.FREEBUFF_CLIENT_ID) return null
+  const baseUrl = request ? baseUrlFor(env, request) : env.APP_ORIGIN || null
+  if (!baseUrl) return null
+  let auth = authInstances.get(baseUrl)
+  if (!auth) {
+    auth = createFreebuffAuth({
+      clientId: env.FREEBUFF_CLIENT_ID,
+      issuer: env.FREEBUFF_ISSUER,
+      baseUrl,
+      allowInsecureLocalhost: /^http:\/\/(localhost|127\.0\.0\.1|\[::1\])/.test(baseUrl),
+    })
+    authInstances.set(baseUrl, auth)
+  }
+  return auth
 }
 
 async function currentUser(c: { env: Env; req: { raw: Request } }): Promise<FreebuffUser | null> {
-  const auth = authFor(c.env)
+  const auth = authFor(c.env, c.req.raw)
   if (!auth) return null
   return auth.getUser(c.req.raw)
 }
 
 function sameOrigin(c: { env: Env; req: { raw: Request } }): boolean {
-  return !c.env.APP_ORIGIN || isSameOriginRequest(c.req.raw, c.env.APP_ORIGIN)
+  const baseUrl = baseUrlFor(c.env, c.req.raw)
+  return !baseUrl || isSameOriginRequest(c.req.raw, baseUrl)
 }
 
 // --- Database ---------------------------------------------------------------

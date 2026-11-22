@@ -1,15 +1,17 @@
-// Situs utama disajikan sebagai file statis di Vercel. CMS-nya butuh server,
-// jadi API-nya ada di deployment Freebuff Sites yang sama dengan CMS. Di sana
-// `cmsOrigin` kosong dan semua request tetap same-origin.
-const HOSTED_CMS = 'https://ngoprekbareng-j0t1xq-preview.freebuff.site'
+// Situs dan CMS sekarang disajikan dari deployment yang sama (assalimi.my.id),
+// jadi semua request API tetap same-origin dan cookie login ikut terkirim.
+//
+// Build statis lama (Vercel) tidak punya API sama sekali, jadi di sana request
+// diarahkan ke deployment production Freebuff Sites.
+declare const __STATIC_BUILD__: boolean
+
+const HOSTED_CMS = 'https://ngoprekbareng-j0t1xq.freebuff.site'
+const STATIC_BUILD = typeof __STATIC_BUILD__ !== 'undefined' && __STATIC_BUILD__
 
 function detectOrigin(): string {
   const configured = import.meta.env.VITE_CMS_API as string | undefined
-  if (configured) return configured.replace(/\/$/, '')
-  if (typeof window === 'undefined') return ''
-  const host = window.location.hostname
-  const sameOrigin = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.freebuff.site')
-  return sameOrigin ? '' : HOSTED_CMS
+  if (configured !== undefined) return configured.replace(/\/$/, '')
+  return STATIC_BUILD ? HOSTED_CMS : ''
 }
 
 export const cmsOrigin = detectOrigin()
